@@ -65,6 +65,7 @@ elements.messageForm.addEventListener("submit", async event => {
   await sendMessage();
 });
 
+elements.messages.addEventListener("click", handleMessageAction);
 window.addEventListener("scroll", handleMessageScroll, { passive: true });
 elements.newProject.addEventListener("click", createProject);
 elements.forkBranch.addEventListener("click", createBranch);
@@ -331,7 +332,7 @@ async function render() {
   state.messageWindowStart = windowStart;
 
   elements.messages.innerHTML = visibleMessages
-    .map(message => `<article class="message ${message.role}">${renderMessageContent(message)}</article>`)
+    .map(message => renderMessage(message))
     .join("");
 
   const hasBranch = Boolean(state.currentBranchId);
@@ -361,6 +362,68 @@ function setBusy(isBusy) {
 
 function setStatus(message) {
   elements.status.textContent = message;
+}
+
+function renderMessage(message) {
+  const actions = message.role === "assistant"
+    ? `<div class="message-actions"><button type="button" data-action="copy" data-message-id="${message.id}" title="Copy answer" aria-label="Copy answer">⧉</button><button type="button" data-action="delete-turn" data-message-id="${message.id}" title="Delete question and answer" aria-label="Delete question and answer">×</button></div>`
+    : "";
+
+  return `<article class="message ${message.role}" data-message-id="${message.id}"><div class="message-body">${renderMessageContent(message)}</div>${actions}</article>`;
+}
+
+async function handleMessageAction(event) {
+  const button = event.target.closest("button[data-action]");
+  if (!button) {
+    return;
+  }
+
+  const messageId = button.dataset.messageId;
+  const message = state.messages.find(item => item.id === messageId);
+  if (!message) {
+    return;
+  }
+
+  try {
+    if (button.dataset.action === "copy") {
+      await copyMessage(message);
+      return;
+    }
+
+    if (button.dataset.action === "delete-turn") {
+      await deleteTurn(message);
+    }
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
+async function copyMessage(message) {
+  try {
+    await navigator.clipboard.writeText(message.content);
+    setStatus("Copied.");
+  } catch {
+    setStatus("Copy failed.");
+  }
+}
+
+async function deleteTurn(message) {
+  const confirmed = confirm("Delete this question and answer from chat history?");
+  if (!confirmed || !state.currentBranchId) {
+    return;
+  }
+
+  await fetch(`/api/branches/${state.currentBranchId}/messages/${message.id}/turn`, {
+    method: "DELETE"
+  }).then(async response => {
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(error.error ?? "Delete failed.");
+    }
+  });
+
+  setStatus("Deleted from context.");
+  await loadMessages();
 }
 
 function resizeComposer() {

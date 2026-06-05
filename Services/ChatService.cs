@@ -212,6 +212,60 @@ public sealed class ChatService(AppDbContext db, OllamaClient ollama, IOptions<O
         await db.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task DeleteTurnAsync(Guid branchId, Guid messageId, CancellationToken cancellationToken)
+    {
+        var target = await db.Messages
+            .Include(message => message.Branch)
+            .ThenInclude(branch => branch!.Project)
+            .FirstOrDefaultAsync(message => message.Id == messageId && message.BranchId == branchId, cancellationToken);
+
+        if (target?.Branch?.Project is null)
+        {
+            throw new InvalidOperationException("Message not found.");
+        }
+
+        var messagesToDelete = new List<ChatMessage> { target };
+
+        if (target.Role == "assistant")
+        {
+            var question = await db.Messages
+                .Where(message => message.BranchId == branchId && message.Role == "user" && message.Sequence < target.Sequence)
+                .OrderByDescending(message => message.Sequence)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (question is not null)
+            {
+                messagesToDelete.Add(question);
+            }
+        }
+        else if (target.Role == "user")
+        {
+            var answer = await db.Messages
+                .Where(message => message.BranchId == branchId && message.Role == "assistant" && message.Sequence > target.Sequence)
+                .OrderBy(message => message.Sequence)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (answer is not null)
+            {
+                messagesToDelete.Add(answer);
+            }
+        }
+
+        db.Messages.RemoveRange(messagesToDelete.DistinctBy(message => message.Id));
+
+        var staleSummaries = await db.Summaries
+            .Where(summary =>
+                summary.BranchId == branchId ||
+                (summary.ProjectId == target.Branch.ProjectId && summary.Scope == SummaryScope.Project))
+            .ToListAsync(cancellationToken);
+        db.Summaries.RemoveRange(staleSummaries);
+
+        target.Branch.UpdatedAt = DateTimeOffset.UtcNow;
+        target.Branch.Project.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<ContextSummary> CreateSummaryAsync(Guid branchId, SummaryScope scope, CancellationToken cancellationToken)
     {
         var branch = await db.Branches

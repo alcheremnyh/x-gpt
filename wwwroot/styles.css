@@ -139,7 +139,10 @@ select {
 }
 
 .message {
-  max-width: 100%;
+  position: relative;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: min(780px, 86%);
   color: #dce1e8;
   line-height: 1.35;
 }
@@ -209,19 +212,58 @@ select {
 
 .message.user {
   align-self: flex-end;
-  max-width: min(720px, 88%);
-  border-radius: 9px;
-  padding: 0.28rem 0.5rem;
+  max-width: min(620px, 72%);
+  border-radius: 8px;
+  padding: 0.18rem 0.42rem;
   background: #141820;
   color: #f5f7fa;
+  line-height: 1.22;
+}
+
+.message.user .message-body {
   white-space: pre-wrap;
 }
 
+.message.assistant {
+  padding-bottom: 1.6rem;
+}
+
 .message.thinking {
+  width: min(780px, 86%);
+  max-width: min(780px, 86%);
   border-left: 2px solid #303846;
   padding-left: 0.65rem;
   color: #7f8793;
   font-size: 0.9rem;
+}
+
+.message-actions {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  gap: 0.18rem;
+  opacity: 0.45;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.message-actions button {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  padding: 0;
+  background: #151a22;
+  color: #8d98a8;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.message-actions button:hover {
+  color: #ffffff;
 }
 
 .message.thinking::before {

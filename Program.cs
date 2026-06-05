@@ -203,6 +203,23 @@ app.MapPost("/api/branches/{branchId:guid}/messages", async (
     }
 });
 
+app.MapDelete("/api/branches/{branchId:guid}/messages/{messageId:guid}/turn", async (
+    Guid branchId,
+    Guid messageId,
+    ChatService chatService,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        await chatService.DeleteTurnAsync(branchId, messageId, cancellationToken);
+        return Results.NoContent();
+    }
+    catch (InvalidOperationException error)
+    {
+        return Results.BadRequest(new { error = error.Message });
+    }
+});
+
 app.MapGet("/api/projects/{projectId:guid}/summaries", async (
     Guid projectId,
     AppDbContext db,
