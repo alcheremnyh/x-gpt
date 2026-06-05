@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "x-gpt": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+# Build results
+bin/
+obj/
+out/
+artifacts/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+.vs/
+.vscode/
+.idea/
+
+# Rider
+*.sln.iml
+
+# Test results and coverage
+TestResults/
+coverage/
+coverage.*/
+*.coverage
+*.coveragexml
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Logs
+*.log
+logs/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.Local.json
+appsettings.Secrets.json
+secrets.json
+
+# Docker/local compose overrides
+docker-compose.override.yml
+compose.override.yml
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
