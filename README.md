@@ -76,7 +76,7 @@ If Ollama runs on another machine in your network, use that machine's LAN addres
 Clone the repository:
 
 ```powershell
-git clone <your-repository-url>
+git clone https://github.com/alcheremnyh/x-gpt.git
 cd x-gpt
 ```
 
