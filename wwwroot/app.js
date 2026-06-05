@@ -52,6 +52,14 @@ elements.models.addEventListener("change", () => {
   render();
 });
 
+elements.messageContent.addEventListener("input", resizeComposer);
+elements.messageContent.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    elements.messageForm.requestSubmit();
+  }
+});
+
 elements.messageForm.addEventListener("submit", async event => {
   event.preventDefault();
   await sendMessage();
@@ -71,6 +79,7 @@ if ("speechSynthesis" in window) {
 }
 
 refreshAll();
+resizeComposer();
 
 async function refreshAll() {
   setStatus("Loading...");
@@ -176,6 +185,7 @@ async function sendMessage() {
   }
 
   elements.messageContent.value = "";
+  resizeComposer();
   state.stickToBottom = true;
   state.messages.push({
     id: crypto.randomUUID(),
@@ -321,7 +331,7 @@ async function render() {
   state.messageWindowStart = windowStart;
 
   elements.messages.innerHTML = visibleMessages
-    .map(message => `<article class="message ${message.role}">${escapeHtml(message.content)}</article>`)
+    .map(message => `<article class="message ${message.role}">${renderMessageContent(message)}</article>`)
     .join("");
 
   const hasBranch = Boolean(state.currentBranchId);
@@ -336,6 +346,7 @@ async function render() {
   elements.summarizeProject.disabled = !hasBranch;
   elements.voiceToggle.textContent = state.voiceEnabled ? "Voice on" : "Voice off";
   elements.voiceToggle.classList.toggle("is-active", state.voiceEnabled);
+  resizeComposer();
 }
 
 function getCurrentProject() {
@@ -350,6 +361,17 @@ function setBusy(isBusy) {
 
 function setStatus(message) {
   elements.status.textContent = message;
+}
+
+function resizeComposer() {
+  const maxHeight = 144;
+  elements.messageContent.style.height = "auto";
+  const nextHeight = Math.min(elements.messageContent.scrollHeight, maxHeight);
+  elements.messageContent.style.height = `${nextHeight}px`;
+  elements.messageContent.style.overflowY = elements.messageContent.scrollHeight > maxHeight ? "auto" : "hidden";
+  document.documentElement.style.setProperty(
+    "--composer-height",
+    `${elements.messageForm.offsetHeight}px`);
 }
 
 function getRenderableMessages() {
@@ -531,6 +553,135 @@ function consumeStreamLines(buffer, thinkingMessage, assistantMessage) {
   }
 
   return rest;
+}
+
+function renderMessageContent(message) {
+  if (message.role === "user") {
+    return escapeHtml(message.content);
+  }
+
+  return renderMarkdown(message.content);
+}
+
+function renderMarkdown(markdown) {
+  const normalized = normalizeModelText(markdown);
+  const lines = normalized.split("\n");
+  const html = [];
+  let paragraph = [];
+  let list = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length === 0) {
+      return;
+    }
+
+    html.push(`<p>${renderInline(paragraph.join(" "))}</p>`);
+    paragraph = [];
+  };
+
+  const flushList = () => {
+    if (list.length === 0) {
+      return;
+    }
+
+    html.push(`<ul>${list.map(item => `<li>${renderInline(item)}</li>`).join("")}</ul>`);
+    list = [];
+  };
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    if (isTableStart(lines, index)) {
+      flushParagraph();
+      flushList();
+
+      const tableLines = [];
+      while (index < lines.length && lines[index].trim().startsWith("|")) {
+        tableLines.push(lines[index].trim());
+        index += 1;
+      }
+
+      index -= 1;
+      html.push(renderTable(tableLines));
+      continue;
+    }
+
+    const heading = trimmed.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      flushParagraph();
+      flushList();
+      const level = heading[1].length + 2;
+      html.push(`<h${level}>${renderInline(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    const listItem = trimmed.match(/^[-*]\s+(.+)$/);
+    if (listItem) {
+      flushParagraph();
+      list.push(listItem[1]);
+      continue;
+    }
+
+    flushList();
+    paragraph.push(trimmed);
+  }
+
+  flushParagraph();
+  flushList();
+
+  return html.join("");
+}
+
+function normalizeModelText(value) {
+  return value
+    .replaceAll("$\\rightarrow$", "→")
+    .replaceAll("\\rightarrow", "→")
+    .replaceAll("$\\leftarrow$", "←")
+    .replaceAll("\\leftarrow", "←")
+    .replaceAll("$\\Rightarrow$", "⇒")
+    .replaceAll("\\Rightarrow", "⇒");
+}
+
+function renderInline(value) {
+  return escapeHtml(value)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+function isTableStart(lines, index) {
+  return lines[index]?.trim().startsWith("|")
+    && lines[index + 1]?.trim().match(/^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/);
+}
+
+function renderTable(lines) {
+  if (lines.length < 2) {
+    return `<p>${renderInline(lines.join(" "))}</p>`;
+  }
+
+  const headers = splitTableRow(lines[0]);
+  const rows = lines.slice(2).map(splitTableRow);
+
+  return `<div class="table-wrap"><table><thead><tr>${headers
+    .map(cell => `<th>${renderInline(cell)}</th>`)
+    .join("")}</tr></thead><tbody>${rows
+    .map(row => `<tr>${row.map(cell => `<td>${renderInline(cell)}</td>`).join("")}</tr>`)
+    .join("")}</tbody></table></div>`;
+}
+
+function splitTableRow(row) {
+  return row
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map(cell => cell.trim());
 }
 
 function escapeHtml(value) {

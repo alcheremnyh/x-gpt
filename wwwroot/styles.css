@@ -1,6 +1,7 @@
 :root {
   --composer-width: min(860px, calc(100vw - 2rem));
   --topbar-height: 3.4rem;
+  --composer-height: 2.05rem;
   --composer-bottom: 1.55rem;
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,7 +19,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   border: 0;
   background: transparent;
   color: inherit;
@@ -50,7 +52,8 @@ button:disabled {
 }
 
 select,
-input {
+input,
+textarea {
   width: 100%;
 }
 
@@ -102,7 +105,7 @@ select {
   width: min(860px, calc(100vw - 2rem));
   min-height: 100vh;
   margin: 0 auto;
-  padding: calc(var(--topbar-height) + 1rem) 0 calc(var(--composer-bottom) + 4rem);
+  padding: calc(var(--topbar-height) + 1rem) 0 calc(var(--composer-bottom) + var(--composer-height) + 2.5rem);
 }
 
 .hero {
@@ -139,7 +142,69 @@ select {
   max-width: 100%;
   color: #dce1e8;
   line-height: 1.35;
-  white-space: pre-wrap;
+}
+
+.message p,
+.message ul,
+.message table,
+.message h3,
+.message h4,
+.message h5,
+.message h6 {
+  margin: 0 0 0.7rem;
+}
+
+.message > :last-child {
+  margin-bottom: 0;
+}
+
+.message ul {
+  padding-left: 1.2rem;
+}
+
+.message li + li {
+  margin-top: 0.25rem;
+}
+
+.message h3,
+.message h4,
+.message h5,
+.message h6 {
+  color: #f2f5f8;
+  line-height: 1.25;
+}
+
+.message code {
+  border-radius: 5px;
+  padding: 0.08rem 0.3rem;
+  background: #171b22;
+  color: #f5f7fa;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.92em;
+}
+
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.message table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.message th,
+.message td {
+  border: 1px solid #27303d;
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.message th {
+  background: #111820;
+  color: #f2f5f8;
 }
 
 .message.user {
@@ -149,6 +214,7 @@ select {
   padding: 0.28rem 0.5rem;
   background: #141820;
   color: #f5f7fa;
+  white-space: pre-wrap;
 }
 
 .message.thinking {
@@ -180,14 +246,14 @@ select {
   width: auto;
   display: grid;
   grid-template-columns: 1fr auto auto;
-  align-items: center;
+  align-items: end;
   gap: 0.45rem;
   border: 1px solid #242932;
   border-radius: 12px;
   background: #101319;
   box-shadow: 0 12px 36px rgb(0 0 0 / 28%);
-  height: 2.05rem;
-  max-height: 2.05rem;
+  height: auto;
+  max-height: 10rem;
   min-height: 2.05rem;
   overflow: visible;
   padding: 0.18rem 0.28rem 0.18rem 0.55rem;
@@ -197,11 +263,15 @@ select {
   border-color: #3a4351;
 }
 
-.composer input {
+.composer textarea {
   height: 1.45rem;
+  max-height: 9rem;
+  min-height: 1.45rem;
   padding: 0;
   outline: 0;
   line-height: 1.45rem;
+  overflow-y: hidden;
+  resize: none;
 }
 
 .composer button {
@@ -269,7 +339,7 @@ select {
   position: fixed;
   z-index: 11;
   right: max(1rem, calc((100vw - 860px) / 2));
-  bottom: calc(var(--composer-bottom) + 2.65rem);
+  bottom: calc(var(--composer-bottom) + var(--composer-height) + 0.6rem);
   max-width: min(520px, 80vw);
   margin: 0;
   overflow: hidden;
