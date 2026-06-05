@@ -450,4 +450,4 @@ Use `docker compose down` without `-v` to keep data.
 
 ## License
 
-Add a license before publishing the repository as open source. Common choices are MIT, Apache-2.0, or AGPL-3.0 depending on your goals.
+This project is released under the MIT License. See [LICENSE](LICENSE).
