@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>x-gpt</title>
+  <link rel="stylesheet" href="/styles.css?v=20260605-1726">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <strong>x-gpt</strong>
+      <div class="controls">
+        <select id="projects" aria-label="Project"></select>
+        <select id="branches" aria-label="Branch"></select>
+        <button id="new-project" type="button">New</button>
+        <button id="fork-branch" type="button">Fork</button>
+        <button id="summarize-branch" type="button">Sum</button>
+        <button id="summarize-project" type="button">Proj sum</button>
+        <button id="voice-toggle" type="button">Voice off</button>
+        <button id="refresh" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div id="hero" class="hero">
+        <h1>Ask anything</h1>
+        <p>Local Ollama chat with projects, branches, and saved context.</p>
+      </div>
+      <div id="messages" class="messages"></div>
+
+      <form id="message-form" class="composer">
+        <input id="message-content" placeholder="Ask..." autocomplete="off">
+        <details class="model-picker">
+          <summary title="Choose model">Model ▾</summary>
+          <select id="models" aria-label="Ollama model" size="8"></select>
+        </details>
+        <button type="submit">Send</button>
+      </form>
+
+      <p id="model-caption" class="model-caption"></p>
+
+      <p id="status" class="status"></p>
+    </section>
+  </main>
+
+  <script src="/app.js?v=20260605-1726"></script>
+</body>
+</html>

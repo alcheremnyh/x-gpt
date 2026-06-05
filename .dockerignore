@@ -1,6 +1,7 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/.env.*
 **/.git
 **/.gitignore
 **/.project
@@ -19,6 +20,14 @@
 **/node_modules
 **/npm-debug.log
 **/obj
+**/data
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/appsettings.Secrets.json
 **/secrets.dev.yaml
 **/values.dev.yaml
 LICENSE

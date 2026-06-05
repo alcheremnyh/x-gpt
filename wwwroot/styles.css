@@ -1,0 +1,303 @@
+:root {
+  --composer-width: min(860px, calc(100vw - 2rem));
+  --topbar-height: 3.4rem;
+  --composer-bottom: 1.55rem;
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0b0d10;
+  color: #eceff3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  color: #aeb6c2;
+  font-size: 0.86rem;
+}
+
+button:hover,
+select:hover {
+  background: #171b22;
+  color: #ffffff;
+}
+
+button.is-active {
+  background: #253044;
+  color: #ffffff;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+select,
+input {
+  width: 100%;
+}
+
+select {
+  max-width: 180px;
+  border-radius: 999px;
+  padding: 0.45rem 1.9rem 0.45rem 0.7rem;
+  color: #aeb6c2;
+  font-size: 0.86rem;
+}
+
+.app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--topbar-height);
+  padding: 0.8rem 1rem;
+  background: rgb(11 13 16 / 92%);
+  backdrop-filter: blur(14px);
+}
+
+.topbar strong {
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.workspace {
+  position: relative;
+  display: block;
+  width: min(860px, calc(100vw - 2rem));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: calc(var(--topbar-height) + 1rem) 0 calc(var(--composer-bottom) + 4rem);
+}
+
+.hero {
+  align-self: end;
+  padding: 5vh 0 1rem;
+  text-align: center;
+}
+
+.hero[hidden] {
+  display: none;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 650;
+  letter-spacing: -0.06em;
+}
+
+.hero p {
+  margin: 0.75rem 0 0;
+  color: #7f8793;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: calc(100vh - var(--topbar-height) - 5rem);
+  padding: 0 0 0.75rem;
+}
+
+.message {
+  max-width: 100%;
+  color: #dce1e8;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.message.user {
+  align-self: flex-end;
+  max-width: min(720px, 88%);
+  border-radius: 9px;
+  padding: 0.28rem 0.5rem;
+  background: #141820;
+  color: #f5f7fa;
+}
+
+.message.thinking {
+  border-left: 2px solid #303846;
+  padding-left: 0.65rem;
+  color: #7f8793;
+  font-size: 0.9rem;
+}
+
+.message.thinking::before {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #5f6875;
+  content: "Reasoning";
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.message .role {
+  display: none;
+}
+
+.composer {
+  position: fixed;
+  z-index: 10;
+  right: max(1rem, calc((100vw - 860px) / 2));
+  bottom: var(--composer-bottom);
+  left: max(1rem, calc((100vw - 860px) / 2));
+  width: auto;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid #242932;
+  border-radius: 12px;
+  background: #101319;
+  box-shadow: 0 12px 36px rgb(0 0 0 / 28%);
+  height: 2.05rem;
+  max-height: 2.05rem;
+  min-height: 2.05rem;
+  overflow: visible;
+  padding: 0.18rem 0.28rem 0.18rem 0.55rem;
+}
+
+.composer:focus-within {
+  border-color: #3a4351;
+}
+
+.composer input {
+  height: 1.45rem;
+  padding: 0;
+  outline: 0;
+  line-height: 1.45rem;
+}
+
+.composer button {
+  background: #eceff3;
+  color: #0b0d10;
+  font-weight: 650;
+  padding: 0.26rem 0.58rem;
+}
+
+.model-picker {
+  position: relative;
+  z-index: 12;
+}
+
+.model-picker summary {
+  display: grid;
+  width: 4.2rem;
+  height: 1.45rem;
+  cursor: pointer;
+  list-style: none;
+  place-items: center;
+  border-radius: 999px;
+  color: #aeb6c2;
+}
+
+.model-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+.model-picker[open] summary,
+.model-picker summary:hover {
+  background: #171b22;
+  color: #ffffff;
+}
+
+.model-picker select {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.45rem);
+  width: min(18rem, 72vw);
+  max-width: none;
+  border: 1px solid #242932;
+  border-radius: 12px;
+  padding: 0.4rem;
+  background: #101319;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 38%);
+}
+
+.model-caption {
+  position: fixed;
+  z-index: 10;
+  left: max(1rem, calc((100vw - 860px) / 2));
+  bottom: 0.25rem;
+  max-width: min(520px, 80vw);
+  margin: 0;
+  overflow: hidden;
+  color: #5f6875;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  position: fixed;
+  z-index: 11;
+  right: max(1rem, calc((100vw - 860px) / 2));
+  bottom: calc(var(--composer-bottom) + 2.65rem);
+  max-width: min(520px, 80vw);
+  margin: 0;
+  overflow: hidden;
+  color: #7f8793;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .controls {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .workspace {
+    padding-top: calc(var(--topbar-height) + 1rem);
+  }
+
+  select {
+    min-width: 140px;
+  }
+}
