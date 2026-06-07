@@ -661,6 +661,46 @@ function renderMarkdown(markdown) {
       continue;
     }
 
+    const fence = trimmed.match(/^```(\w+)?\s*(.*)$/);
+    if (fence) {
+      flushParagraph();
+      flushList();
+
+      const language = fence[1] ?? "";
+      const codeLines = [];
+      if (fence[2]) {
+        codeLines.push(fence[2]);
+      }
+
+      let closed = false;
+      while (index + 1 < lines.length) {
+        index += 1;
+        const codeLine = lines[index];
+        const closingIndex = codeLine.indexOf("```");
+
+        if (closingIndex >= 0) {
+          if (closingIndex > 0) {
+            codeLines.push(codeLine.slice(0, closingIndex).trimEnd());
+          }
+
+          closed = true;
+          break;
+        }
+
+        codeLines.push(codeLine);
+      }
+
+      html.push(renderCodeBlock(codeLines.join("\n"), language, closed));
+      continue;
+    }
+
+    if (/^---+$/.test(trimmed)) {
+      flushParagraph();
+      flushList();
+      html.push("<hr>");
+      continue;
+    }
+
     if (isTableStart(lines, index)) {
       flushParagraph();
       flushList();
@@ -737,6 +777,13 @@ function renderTable(lines) {
     .join("")}</tr></thead><tbody>${rows
     .map(row => `<tr>${row.map(cell => `<td>${renderInline(cell)}</td>`).join("")}</tr>`)
     .join("")}</tbody></table></div>`;
+}
+
+function renderCodeBlock(code, language, closed) {
+  const label = language ? `<div class="code-label">${escapeHtml(language)}</div>` : "";
+  const warning = closed ? "" : `<div class="code-warning">Unclosed code block</div>`;
+
+  return `<div class="code-block">${label}<pre><code>${escapeHtml(code.trim())}</code></pre>${warning}</div>`;
 }
 
 function splitTableRow(row) {

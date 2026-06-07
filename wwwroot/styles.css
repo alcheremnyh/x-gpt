@@ -150,6 +150,8 @@ select {
 .message p,
 .message ul,
 .message table,
+.message pre,
+.message hr,
 .message h3,
 .message h4,
 .message h5,
@@ -184,6 +186,46 @@ select {
   color: #f5f7fa;
   font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
   font-size: 0.92em;
+}
+
+.code-block {
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid #27303d;
+  border-radius: 10px;
+  background: #0d1117;
+}
+
+.code-label,
+.code-warning {
+  padding: 0.35rem 0.65rem;
+  color: #8d98a8;
+  font-size: 0.76rem;
+}
+
+.code-warning {
+  color: #f0b76a;
+}
+
+.message pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.75rem;
+}
+
+.message pre code {
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: #e6edf3;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+.message hr {
+  border: 0;
+  border-top: 1px solid #27303d;
 }
 
 .table-wrap {
