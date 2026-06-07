@@ -378,13 +378,18 @@ async function handleMessageAction(event) {
     return;
   }
 
-  const messageId = button.dataset.messageId;
-  const message = state.messages.find(item => item.id === messageId);
-  if (!message) {
-    return;
-  }
-
   try {
+    if (button.dataset.action === "copy-code") {
+      await copyCodeBlock(button);
+      return;
+    }
+
+    const messageId = button.dataset.messageId;
+    const message = state.messages.find(item => item.id === messageId);
+    if (!message) {
+      return;
+    }
+
     if (button.dataset.action === "copy") {
       await copyMessage(message);
       return;
@@ -404,6 +409,21 @@ async function copyMessage(message) {
     setStatus("Copied.");
   } catch {
     setStatus("Copy failed.");
+  }
+}
+
+async function copyCodeBlock(button) {
+  const code = button.closest(".code-block")?.querySelector("pre code")?.textContent;
+  if (!code) {
+    setStatus("Code block is empty.");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(code);
+    setStatus("Code copied.");
+  } catch {
+    setStatus("Code copy failed.");
   }
 }
 
@@ -782,8 +802,9 @@ function renderTable(lines) {
 function renderCodeBlock(code, language, closed) {
   const label = language ? `<div class="code-label">${escapeHtml(language)}</div>` : "";
   const warning = closed ? "" : `<div class="code-warning">Unclosed code block</div>`;
+  const copyButton = `<button type="button" class="code-copy" data-action="copy-code" title="Copy code" aria-label="Copy code">⧉</button>`;
 
-  return `<div class="code-block">${label}<pre><code>${escapeHtml(code.trim())}</code></pre>${warning}</div>`;
+  return `<div class="code-block">${label}<pre><code>${escapeHtml(code.trim())}</code></pre>${warning}<div class="code-actions">${copyButton}</div></div>`;
 }
 
 function splitTableRow(row) {

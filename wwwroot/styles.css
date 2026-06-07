@@ -189,6 +189,7 @@ select {
 }
 
 .code-block {
+  position: relative;
   max-width: 100%;
   overflow: hidden;
   border: 1px solid #27303d;
@@ -226,6 +227,32 @@ select {
 .message hr {
   border: 0;
   border-top: 1px solid #27303d;
+}
+
+.code-copy {
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  place-items: center;
+  padding: 0;
+  background: #151a22;
+  color: #8d98a8;
+  font-size: 0.82rem;
+  opacity: 0.65;
+}
+
+.code-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0.45rem 0.45rem;
+}
+
+.code-block:hover .code-copy {
+  opacity: 1;
+}
+
+.code-copy:hover {
+  color: #ffffff;
 }
 
 .table-wrap {
